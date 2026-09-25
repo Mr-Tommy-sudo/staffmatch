@@ -1,0 +1,7 @@
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    max_user_id BIGINT NOT NULL UNIQUE,
+    role VARCHAR(16),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT users_role_check CHECK (role IN ('EMPLOYER', 'CANDIDATE'))
+);
