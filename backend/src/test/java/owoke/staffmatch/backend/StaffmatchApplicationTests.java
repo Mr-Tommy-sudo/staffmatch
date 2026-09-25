@@ -15,8 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import owoke.staffmatch.backend.auth.MaxAuthenticationFilter;
-import owoke.staffmatch.backend.auth.MaxInitDataFixtures;
+import owoke.staffmatch.backend.auth.filter.MaxAuthenticationFilter;
+import owoke.staffmatch.backend.auth.support.MaxInitDataFixtures;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(properties = "MAX_BOT_TOKEN=" + MaxInitDataFixtures.BOT_TOKEN)
