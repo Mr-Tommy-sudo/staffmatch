@@ -155,6 +155,41 @@ class WorkflowIntegrationTests {
     }
 
     @Test
+    void duplicateMatchingInputsAreRejectedAtJavaBoundary() throws Exception {
+        long candidate = 810007L;
+        long employer = 810008L;
+        role(candidate, "CANDIDATE");
+        role(employer, "EMPLOYER");
+        mvc.perform(put("/api/v1/candidate/profile").header(header(), signed(candidate))
+                .contentType("application/json").content("""
+                        {"workFormats":["REMOTE"],"skills":[
+                          {"code":"PYTHON","level":2},{"code":"PYTHON","level":4}]}
+                        """)).andExpect(status().isBadRequest());
+        mvc.perform(put("/api/v1/candidate/profile").header(header(), signed(candidate))
+                .contentType("application/json").content("""
+                        {"workFormats":["REMOTE","REMOTE"],
+                         "skills":[{"code":"PYTHON","level":4}]}
+                        """)).andExpect(status().isBadRequest());
+        mvc.perform(put("/api/v1/candidate/profile").header(header(), signed(candidate))
+                .contentType("application/json").content("""
+                        {"workFormats":["REMOTE"],"skills":[null]}
+                        """)).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/v1/employer/vacancies").header(header(), signed(employer))
+                .contentType("application/json").content("""
+                        {"role":"Python","workFormat":"REMOTE","testMode":"NONE",
+                         "skills":[{"code":"PYTHON","minLevel":2,"required":true,"weight":1},
+                                   {"code":"PYTHON","minLevel":3,"required":true,"weight":1}]}
+                        """)).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/v1/employer/vacancies").header(header(), signed(employer))
+                .contentType("application/json").content("""
+                        {"role":"Python","workFormat":"REMOTE","testMode":"AUTO",
+                         "skills":[{"code":"PYTHON","minLevel":2,"required":true,"weight":1}],
+                         "competencies":[{"code":"PYTHON","weight":1},
+                                         {"code":"PYTHON","weight":2}]}
+                        """)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void pythonFailureKeepsVacancyForRetry() throws Exception {
         long employer = 810006L;
         role(employer, "EMPLOYER");
