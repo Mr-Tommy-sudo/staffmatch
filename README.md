@@ -1,10 +1,12 @@
 # StaffMatch
 
+Python-сервис для matching, тестов и рейтинга описан в [docs/python-service.md](docs/python-service.md).
+
 ## Java backend locally with Docker
 
-Copy `.env.example` to `.env` and set `POSTGRES_PASSWORD` and the MAX bot token.
+Set `POSTGRES_PASSWORD` and the MAX bot token in `.env`.
 The bot token is used to verify MAX Web App `initData`; keep `.env` out of Git.
-Set `CORS_ALLOWED_ORIGINS` to the exact origin hosting the frontend. Separate
+Set `CORS_ALLOWED_ORIGINS` to the exact origin hosting the frontend. Separateстоп
 multiple origins with commas; do not use `*` for a deployed environment.
 
 ```powershell
@@ -38,10 +40,9 @@ The Java backend owns profiles, vacancies, test assignments, answers, results,
 rankings, and invitations. It calls the four JSON endpoints described in
 `docs/python-contract-v0.2.md`. Python does not connect to PostgreSQL.
 
-Set `PYTHON_BASE_URL` in `.env`. The default points to port 8000 on the Docker
-host for local development. When the Python service joins this Compose project,
-use `PYTHON_BASE_URL=http://python:8000`. The backend starts without Python, but
-vacancy processing records a failed status until its calculations can be retried.
+Compose starts the Python service and sets `PYTHON_BASE_URL=http://python:8000`.
+Add `OPENROUTER_API_KEY` to `.env` for test generation and free-text grading.
+Matching, ranking, and choice grading work without that key.
 
 Select `CANDIDATE` or `EMPLOYER` with `PUT /api/v1/me/role` first. All routes
 below require the same `X-Max-Init-Data` header as `/api/v1/me`.
