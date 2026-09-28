@@ -5,8 +5,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
-from logic import matching, ranking, scoring
-from models import (
+from app.calculations import matching, ranking, scoring
+from app.schemas import (
     ErrorResponse,
     GenerateRequest,
     GenerateResponse,
@@ -17,7 +17,7 @@ from models import (
     ScoreRequest,
     ScoreResponse,
 )
-from openrouter import ModelUnavailable, generate, grade_free_text
+from app.openrouter import ModelUnavailable, generate, grade_free_text
 
 
 app = FastAPI(title="StaffMatch Python API", version="0.1.0")

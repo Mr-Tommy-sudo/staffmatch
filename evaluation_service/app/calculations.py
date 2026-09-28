@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal, ROUND_HALF_UP
 
-from models import (
+from app.schemas import (
     Breakdown,
     Explanation,
     FinalEntry,

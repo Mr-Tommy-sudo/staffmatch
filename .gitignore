@@ -1,7 +1,7 @@
 HELP.md
 target/
 .env
-python_service/.venv/
+evaluation_service/.venv/
 __pycache__/
 backend/.env
 .mvn/wrapper/maven-wrapper.jar

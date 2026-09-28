@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-from models import ChoiceQuestion, CorrectAnswer, GenerateRequest, GenerateResponse, ScoreRequest
+from app.schemas import ChoiceQuestion, CorrectAnswer, GenerateRequest, GenerateResponse, ScoreRequest
 
 
 URL = "https://openrouter.ai/api/v1/chat/completions"

@@ -1,7 +1,7 @@
 services:
   python:
     build:
-      context: ./python_service
+      context: ./evaluation_service
     environment:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openai/gpt-5-mini}

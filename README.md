@@ -6,7 +6,7 @@ Python-сервис для matching, тестов и рейтинга описа
 
 Set `POSTGRES_PASSWORD` and the MAX bot token in `.env`.
 The bot token is used to verify MAX Web App `initData`; keep `.env` out of Git.
-Set `CORS_ALLOWED_ORIGINS` to the exact origin hosting the frontend. Separateстоп
+Set `CORS_ALLOWED_ORIGINS` to the exact origin hosting the frontend. Separate
 multiple origins with commas; do not use `*` for a deployed environment.
 
 ```powershell

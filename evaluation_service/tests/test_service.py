@@ -1,10 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from logic import matching, ranking, scoring
-from main import app
-from models import GenerateRequest, MatchingRequest, RankingRequest, ScoreRequest
-from openrouter import generate
+from pydantic import ValidationError
+
+from app.calculations import matching, ranking, scoring
+from app.main import app
+from app.schemas import CandidateSkill, GenerateRequest, MatchingRequest, RankingRequest, ScoreRequest
+from app.openrouter import generate, grade_free_text
 
 
 class ServiceCheck(unittest.TestCase):
@@ -65,12 +67,46 @@ class ServiceCheck(unittest.TestCase):
             "durationMinutes": 6, "questionCount": 6,
             "competencies": [{"code": "SQL", "weight": 1}],
         })
-        with patch("openrouter.complete", return_value=(draft, "openai/gpt-5-mini")):
+        with patch("app.openrouter.complete", return_value=(draft, "openai/gpt-5-mini")):
             result = generate(request, "testgen:v1")
             another_vacancy = generate(request.model_copy(update={"vacancyId": "v2"}), "testgen:v2")
         self.assertEqual(sum(item.maxScore for item in result.questions), 100)
         self.assertEqual(result.questions[0].correctAnswer.optionIndex, 1)
         self.assertNotEqual(result.testId, another_vacancy.testId)
+
+    def test_java_nonblank_strings_do_not_break_matching(self):
+        for code in ("\u00a0", "\u0085", "\u2007", "\u202f"):
+            with self.subTest(code=repr(code)):
+                request = MatchingRequest.model_validate({
+                    "vacancy": {"id": "v1", "role": "PYTHON_DEVELOPER", "workFormat": "REMOTE",
+                                "skills": [{"code": "PYTHON", "minLevel": 3, "required": True, "weight": 1}]},
+                    "candidates": [{"candidateId": "c1", "workFormats": ["REMOTE"],
+                                    "skills": [{"code": code, "level": 3}]}],
+                })
+                self.assertFalse(matching(request).matches[0].eligible)
+        for code in ("", " ", "\t\n", "\u001c", "\u1680", "\u2000", "\u2028", "\u3000"):
+            with self.subTest(code=repr(code)), self.assertRaises(ValidationError):
+                CandidateSkill(code=code, level=3)
+
+    def test_custom_metadata_and_java_nonblank_answers_can_be_scored(self):
+        request = ScoreRequest.model_validate({
+            "assignmentId": "a1",
+            "questions": [{"questionId": "q1", "type": "SINGLE_CHOICE", "competency": "SQL",
+                           "correctAnswer": {"optionIndex": 0, "explanation": "Первый вариант верный"},
+                           "maxScore": 50},
+                          {"questionId": "q2", "type": "FREE_TEXT", "competency": "SQL",
+                           "text": "Объясните назначение индекса", "maxScore": 50,
+                           "rubric": {"criteria": ["точность"], "referenceAnswer": "Индекс ускоряет поиск"}}],
+            "answers": [{"questionId": "q1", "selectedOptionIndex": 0},
+                        {"questionId": "q2", "text": "\u00a0"}],
+        })
+        output = {"results": [{"questionId": "q2", "score": 0, "explanation": "Ответ не объясняет индекс"}]}
+        with patch("app.openrouter.complete", return_value=(output, "review-model")) as complete:
+            graded, model = grade_free_text(request, "score:a1")
+        content = complete.call_args.args[3]
+        self.assertEqual(content[0]["rubric"]["referenceAnswer"], "Индекс ускоряет поиск")
+        self.assertEqual(content[0]["answer"], "\u00a0")
+        self.assertEqual(scoring(request, graded, model).totalScore, 50)
 
 
 if __name__ == "__main__":

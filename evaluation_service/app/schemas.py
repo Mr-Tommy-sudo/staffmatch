@@ -5,7 +5,11 @@ from typing import Any, Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-NonEmpty = Annotated[str, Field(min_length=1, pattern=r"\S")]
+# Java @NotBlank uses String.isBlank; nonbreaking spaces are nonblank there.
+NonEmpty = Annotated[str, Field(
+    min_length=1,
+    pattern=r"[^\t-\r\u001c-\u0020\u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]",
+)]
 Score = Annotated[float, Field(ge=0, le=100)]
 Format = Literal["REMOTE", "HYBRID", "OFFICE"]
 
@@ -122,6 +126,7 @@ class GenerateRequest(Model):
 
 
 class CorrectAnswer(Model):
+    model_config = ConfigDict(extra="allow")
     optionIndex: Annotated[int, Field(ge=0)]
 
 
@@ -143,6 +148,7 @@ class GenerateResponse(Model):
 
 
 class Rubric(Model):
+    model_config = ConfigDict(extra="allow")
     maxScore: Annotated[int, Field(ge=1, le=100)] | None = None
     criteria: Annotated[list[NonEmpty], Field(min_length=1)]
 
@@ -151,7 +157,7 @@ class ScoreQuestion(Model):
     questionId: NonEmpty
     type: Literal["SINGLE_CHOICE", "FREE_TEXT"]
     competency: NonEmpty
-    text: str | None = None
+    text: NonEmpty | None = None
     correctAnswer: CorrectAnswer | None = None
     rubric: Rubric | None = None
     maxScore: Annotated[int, Field(ge=1, le=100)]
@@ -161,7 +167,7 @@ class ScoreQuestion(Model):
         if self.type == "SINGLE_CHOICE" and self.correctAnswer is None:
             raise ValueError("SINGLE_CHOICE needs correctAnswer")
         if self.type == "FREE_TEXT":
-            if not self.text or not self.text.strip() or self.rubric is None:
+            if self.text is None or self.rubric is None:
                 raise ValueError("FREE_TEXT needs text and rubric")
             if self.rubric.maxScore is not None and self.rubric.maxScore != self.maxScore:
                 raise ValueError("rubric.maxScore must equal maxScore")
@@ -171,7 +177,7 @@ class ScoreQuestion(Model):
 class Answer(Model):
     questionId: NonEmpty
     selectedOptionIndex: Annotated[int, Field(ge=0)] | None = None
-    text: Annotated[str, Field(max_length=4000)] | None = None
+    text: Annotated[NonEmpty, Field(max_length=4000)] | None = None
 
 
 class ScoreRequest(Model):
@@ -195,7 +201,7 @@ class ScoreRequest(Model):
             if question.type == "SINGLE_CHOICE":
                 if answer.selectedOptionIndex is None or answer.text is not None:
                     raise ValueError("SINGLE_CHOICE needs selectedOptionIndex only")
-            elif not answer.text or not answer.text.strip() or answer.selectedOptionIndex is not None:
+            elif answer.text is None or answer.selectedOptionIndex is not None:
                 raise ValueError("FREE_TEXT needs nonempty text only")
         return self
 

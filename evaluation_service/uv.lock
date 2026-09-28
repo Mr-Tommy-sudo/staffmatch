@@ -118,7 +118,7 @@ wheels = [
 ]
 
 [[package]]
-name = "staffmatch-python"
+name = "staffmatch-evaluation"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
