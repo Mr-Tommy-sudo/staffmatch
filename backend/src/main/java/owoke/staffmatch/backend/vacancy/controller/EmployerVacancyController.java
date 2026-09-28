@@ -19,6 +19,7 @@ import owoke.staffmatch.backend.assessment.service.AssessmentService;
 import owoke.staffmatch.backend.assessment.service.TestDefinitionService;
 import owoke.staffmatch.backend.auth.model.MaxPrincipal;
 import owoke.staffmatch.backend.common.AccessService;
+import owoke.staffmatch.backend.common.ApiException;
 import owoke.staffmatch.backend.invitation.service.InvitationService;
 import owoke.staffmatch.backend.matching.service.MatchingService;
 import owoke.staffmatch.backend.ranking.service.RankingService;
@@ -106,6 +107,19 @@ public class EmployerVacancyController {
                                        @PathVariable UUID id) {
         vacancies.owned(access.require(principal, UserRole.EMPLOYER), id);
         return ranking.view(id);
+    }
+
+    @PostMapping("/{id}/ranking/recalculate")
+    public Map<String, Object> recalculateRanking(@AuthenticationPrincipal MaxPrincipal principal,
+                                                   @PathVariable UUID id) {
+        UUID employer = access.require(principal, UserRole.EMPLOYER);
+        var vacancy = vacancies.owned(employer, id);
+        if (!"READY".equals(vacancy.matchingStatus()) ||
+                (!"NONE".equals(vacancy.testMode()) && !"READY".equals(vacancy.generationStatus()))) {
+            throw new ApiException(HttpStatus.CONFLICT, "Vacancy matching or test is not ready");
+        }
+        workflow.recalculateRanking(id);
+        return vacancies.get(employer, id);
     }
 
     @GetMapping("/{id}/test")

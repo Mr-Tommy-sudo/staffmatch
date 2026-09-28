@@ -60,7 +60,8 @@ public class VacancyRepository {
                         (Integer) rs.getObject("duration_minutes"), (Integer) rs.getObject("question_count"),
                         rs.getString("competencies"), rs.getString("matching_status"),
                         rs.getString("generation_status"), rs.getString("ranking_status"),
-                        rs.getString("last_error"))).optional();
+                        rs.getString("last_error"), rs.getString("generation_error"),
+                        rs.getString("matching_error"), rs.getString("ranking_error"))).optional();
     }
 
     public List<Vacancy> byEmployer(UUID employer) {
@@ -70,15 +71,15 @@ public class VacancyRepository {
     }
 
     public void matchingStatus(UUID id, String status, String error) {
-        jdbc.sql("UPDATE vacancies SET matching_status = :status, last_error = :error WHERE id = :id")
+        jdbc.sql("UPDATE vacancies SET matching_status = :status, matching_error = :error WHERE id = :id")
                 .param("status", status).param("error", error).param("id", id).update();
     }
     public void generationStatus(UUID id, String status, String error) {
-        jdbc.sql("UPDATE vacancies SET generation_status = :status, last_error = :error WHERE id = :id")
+        jdbc.sql("UPDATE vacancies SET generation_status = :status, generation_error = :error WHERE id = :id")
                 .param("status", status).param("error", error).param("id", id).update();
     }
     public void rankingStatus(UUID id, String status, String error) {
-        jdbc.sql("UPDATE vacancies SET ranking_status = :status, last_error = :error WHERE id = :id")
+        jdbc.sql("UPDATE vacancies SET ranking_status = :status, ranking_error = :error WHERE id = :id")
                 .param("status", status).param("error", error).param("id", id).update();
     }
 
