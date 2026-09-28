@@ -58,7 +58,15 @@ public class VacancyService {
         result.put("skills", json.read(v.skills())); result.put("testMode", v.testMode());
         result.put("matchingStatus", v.matchingStatus());
         result.put("generationStatus", v.generationStatus());
-        result.put("rankingStatus", v.rankingStatus()); result.put("lastError", v.lastError());
+        result.put("rankingStatus", v.rankingStatus());
+        result.put("generationError", v.generationError());
+        result.put("matchingError", v.matchingError());
+        result.put("rankingError", v.rankingError());
+        result.put("lastError", java.util.stream.Stream.of(
+                v.generationError(), v.matchingError(), v.rankingError())
+                .filter(error -> error != null && !error.isBlank())
+                .collect(java.util.stream.Collectors.joining("; ")));
+        if ("".equals(result.get("lastError"))) result.put("lastError", null);
         return result;
     }
 

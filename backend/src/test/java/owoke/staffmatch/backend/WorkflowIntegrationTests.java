@@ -1,10 +1,14 @@
 package owoke.staffmatch.backend;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +36,7 @@ import owoke.staffmatch.backend.common.JsonSupport;
 import owoke.staffmatch.backend.python.PythonGateway;
 import owoke.staffmatch.backend.python.PythonOperation;
 import owoke.staffmatch.backend.python.PythonServiceException;
+import owoke.staffmatch.backend.vacancy.repository.VacancyRepository;
 import tools.jackson.databind.JsonNode;
 
 @Import(TestcontainersConfiguration.class)
@@ -38,6 +45,7 @@ import tools.jackson.databind.JsonNode;
 class WorkflowIntegrationTests {
     @Autowired MockMvc mvc;
     @Autowired JsonSupport json;
+    @Autowired VacancyRepository vacancyRepository;
     @MockitoBean PythonGateway python;
 
     @BeforeEach
@@ -205,6 +213,106 @@ class WorkflowIntegrationTests {
         assertTrue(vacancy.path("matchingStatus").asText().equals("FAILED"));
         response(get("/api/v1/employer/vacancies/{id}", vacancy.path("id").asText())
                 .header(header(), signed(employer)));
+    }
+
+    @Test
+    void rankingFailureKeepsEntriesAndRetryDoesNotScoreAgain() throws Exception {
+        long candidate = 810021L;
+        long employer = 810022L;
+        role(candidate, "CANDIDATE");
+        role(employer, "EMPLOYER");
+        mvc.perform(put("/api/v1/candidate/profile").header(header(), signed(candidate))
+                .contentType("application/json").content("""
+                {"workFormats":["REMOTE"],"skills":[{"code":"JAVA_CORE","level":4}]}
+                """)).andExpect(status().isOk());
+        JsonNode vacancy = response(post("/api/v1/employer/vacancies").header(header(), signed(employer))
+                .contentType("application/json").content("""
+                {"role":"JAVA_DEVELOPER","workFormat":"REMOTE",
+                 "skills":[{"code":"JAVA_CORE","minLevel":3,"required":true,"weight":25}],
+                 "testMode":"CUSTOM","customQuestions":[{"type":"SINGLE_CHOICE",
+                 "competency":"JAVA_CORE","text":"Unique collection?","options":["List","Set"],
+                 "correctAnswer":{"optionIndex":1},"maxScore":10}]}
+                """));
+        String id = vacancy.path("id").asText();
+        JsonNode oldRanking = response(get("/api/v1/employer/vacancies/{id}/ranking", id)
+                .header(header(), signed(employer)));
+        AtomicBoolean failRank = new AtomicBoolean(true);
+        doAnswer(invocation -> {
+                    if (failRank.get()) throw new PythonServiceException(503, "ranking offline");
+                    return rank(json.tree(invocation.getArgument(1)));
+                }).when(python).call(org.mockito.ArgumentMatchers.eq(PythonOperation.RANK), any(), anyString());
+        JsonNode assignment = response(post("/api/v1/employer/vacancies/{id}/assignments", id)
+                .header(header(), signed(employer)).contentType("application/json")
+                .content("{\"candidateId\":\"" + oldRanking.path("waiting").get(0).path("candidateId").asText() + "\"}"));
+        String assignmentId = assignment.path("id").asText();
+        response(post("/api/v1/candidate/test-assignments/{id}/answers", assignmentId)
+                .header(header(), signed(candidate)).contentType("application/json")
+                .content("{\"answers\":[{\"questionId\":\"q1\",\"selectedOptionIndex\":1}]}"));
+        JsonNode failed = response(get("/api/v1/employer/vacancies/{id}", id)
+                .header(header(), signed(employer)));
+        assertTrue(failed.path("rankingStatus").asText().equals("FAILED"));
+        assertTrue(failed.path("rankingError").asText().contains("ranking offline"));
+        assertTrue(failed.path("lastError").asText().contains("ranking offline"));
+        assertTrue(response(get("/api/v1/employer/vacancies/{id}/ranking", id)
+                .header(header(), signed(employer))).equals(oldRanking));
+        JsonNode failedRecalculation = response(post(
+                "/api/v1/employer/vacancies/{id}/ranking/recalculate", id)
+                .header(header(), signed(employer)));
+        assertTrue(failedRecalculation.path("rankingStatus").asText().equals("FAILED"));
+        assertTrue(response(get("/api/v1/employer/vacancies/{id}/ranking", id)
+                .header(header(), signed(employer))).equals(oldRanking));
+        role(810023L, "EMPLOYER");
+        mvc.perform(post("/api/v1/employer/vacancies/{id}/ranking/recalculate", id)
+                .header(header(), signed(810023L))).andExpect(status().isNotFound());
+        mvc.perform(post("/api/v1/employer/vacancies/{id}/ranking/recalculate", id)
+                .header(header(), signed(candidate))).andExpect(status().isForbidden());
+        failRank.set(false);
+        response(post("/api/v1/employer/vacancies/{id}/assignments/{assignmentId}/score/retry", id, assignmentId)
+                .header(header(), signed(employer)));
+        verify(python, times(1)).call(org.mockito.ArgumentMatchers.eq(PythonOperation.SCORE), any(), anyString());
+        JsonNode recovered = response(get("/api/v1/employer/vacancies/{id}", id)
+                .header(header(), signed(employer)));
+        assertTrue(recovered.path("rankingStatus").asText().equals("READY"));
+        assertTrue(recovered.path("rankingError").isNull());
+        assertTrue(recovered.path("lastError").isNull());
+    }
+
+    @Test
+    void operationErrorsAreIndependentAndRankingEndpointChecksReadiness() throws Exception {
+        long employer = 810024L;
+        role(employer, "EMPLOYER");
+        doThrow(new PythonServiceException(503, "generation offline"))
+                .when(python).call(org.mockito.ArgumentMatchers.eq(PythonOperation.GENERATE), any(), anyString());
+        JsonNode vacancy = response(post("/api/v1/employer/vacancies").header(header(), signed(employer))
+                .contentType("application/json").content("""
+                {"role":"JAVA_DEVELOPER","workFormat":"REMOTE",
+                 "skills":[{"code":"JAVA_CORE","minLevel":2,"required":true,"weight":25}],
+                 "testMode":"AUTO"}
+                """));
+        String id = vacancy.path("id").asText();
+        assertTrue(vacancy.path("generationError").asText().contains("generation offline"));
+        assertTrue(vacancy.path("matchingStatus").asText().equals("READY"));
+        assertTrue(vacancy.path("matchingError").isNull());
+        mvc.perform(post("/api/v1/employer/vacancies/{id}/ranking/recalculate", id)
+                .header(header(), signed(employer))).andExpect(status().isConflict());
+        response(post("/api/v1/employer/vacancies/{id}/matching/recalculate", id)
+                .header(header(), signed(employer)));
+        JsonNode afterMatching = response(get("/api/v1/employer/vacancies/{id}", id)
+                .header(header(), signed(employer)));
+        assertTrue(afterMatching.path("generationError").asText().contains("generation offline"));
+        assertTrue(afterMatching.path("lastError").asText().contains("generation offline"));
+        UUID vacancyId = UUID.fromString(id);
+        vacancyRepository.matchingStatus(vacancyId, "FAILED", "matching offline");
+        vacancyRepository.rankingStatus(vacancyId, "FAILED", "ranking offline");
+        JsonNode allErrors = response(get("/api/v1/employer/vacancies/{id}", id)
+                .header(header(), signed(employer)));
+        assertEquals("generation offline; matching offline; ranking offline",
+                allErrors.path("lastError").asText());
+        vacancyRepository.matchingStatus(vacancyId, "READY", null);
+        JsonNode afterRecovery = response(get("/api/v1/employer/vacancies/{id}", id)
+                .header(header(), signed(employer)));
+        assertTrue(afterRecovery.path("matchingError").isNull());
+        assertEquals("generation offline; ranking offline", afterRecovery.path("lastError").asText());
     }
 
     private JsonNode matching(JsonNode body) {

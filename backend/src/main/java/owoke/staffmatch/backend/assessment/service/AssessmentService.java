@@ -106,6 +106,13 @@ public class AssessmentService {
         var assignment = assignments.find(assignmentId).orElseThrow(
                 () -> new ApiException(HttpStatus.NOT_FOUND, "Assignment not found"));
         if (assignment.answers() == null) throw new ApiException(HttpStatus.CONFLICT, "Answers not submitted");
+        if (results.find(assignmentId).isPresent()) {
+            var vacancy = vacancies.find(assignment.vacancyId()).orElseThrow();
+            if ("FAILED".equals(vacancy.rankingStatus())) {
+                workflow.recalculateRanking(assignment.vacancyId());
+            }
+            return;
+        }
         score(assignmentId);
     }
 
