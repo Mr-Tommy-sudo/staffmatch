@@ -1,5 +1,6 @@
 package owoke.staffmatch.backend.candidate.service;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +22,16 @@ public class CandidateProfileService {
     }
 
     public Map<String, Object> save(UUID userId, CandidateProfileRequest request) {
+        var formats = new HashSet<>(request.workFormats());
+        if (formats.size() != request.workFormats().size()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Duplicate work format");
+        }
+        var codes = new HashSet<String>();
+        for (var skill : request.skills()) {
+            if (!codes.add(skill.code())) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Duplicate skill code");
+            }
+        }
         profiles.save(userId, request);
         return get(userId);
     }

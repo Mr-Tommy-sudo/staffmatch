@@ -1,5 +1,6 @@
 package owoke.staffmatch.backend.vacancy.service;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,12 @@ public class VacancyService {
     }
 
     private void validate(VacancyCreateRequest v) {
+        var skillCodes = new HashSet<String>();
+        for (var skill : v.skills()) {
+            if (!skillCodes.add(skill.code())) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Duplicate vacancy skill code");
+            }
+        }
         if (v.salaryFrom() != null && v.salaryTo() != null && v.salaryFrom() > v.salaryTo()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "salaryFrom must not exceed salaryTo");
         }
@@ -73,14 +80,24 @@ public class VacancyService {
                 v.questionCount() != null && (v.questionCount() < 6 || v.questionCount() > 8)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "AUTO test needs 6–8 questions");
         }
+        if (v.testMode() == VacancyCreateRequest.TestMode.AUTO && v.competencies() != null) {
+            var competencyCodes = new HashSet<String>();
+            for (var competency : v.competencies()) {
+                if (!competencyCodes.add(competency.code())) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Duplicate competency code");
+                }
+            }
+        }
         if (v.testMode() == VacancyCreateRequest.TestMode.CUSTOM &&
                 (v.customQuestions() == null || v.customQuestions().isEmpty())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "CUSTOM test needs questions");
         }
         if (v.testMode() == VacancyCreateRequest.TestMode.CUSTOM) {
+            int totalMaxScore = 0;
             for (var question : v.customQuestions()) {
-                if (question.maxScore() == null || question.maxScore() <= 0) {
-                    throw new ApiException(HttpStatus.BAD_REQUEST, "Question needs positive maxScore");
+                if (question.maxScore() == null || question.maxScore() <= 0
+                        || question.maxScore() > 100 || (totalMaxScore += question.maxScore()) > 100) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Test maxScore must be at most 100");
                 }
                 if (question.type().equals("SINGLE_CHOICE")) {
                     if (question.options() == null || question.options().size() < 2
@@ -93,8 +110,21 @@ public class VacancyService {
                         throw new ApiException(HttpStatus.BAD_REQUEST, "Correct optionIndex is out of range");
                     }
                 } else if (question.type().equals("FREE_TEXT")) {
-                    if (question.rubric() == null || !json.tree(question.rubric()).isObject()) {
-                        throw new ApiException(HttpStatus.BAD_REQUEST, "Free-text question needs rubric");
+                    var rubric = json.tree(question.rubric());
+                    if (!rubric.isObject() || !rubric.path("criteria").isArray()
+                            || rubric.path("criteria").isEmpty()) {
+                        throw new ApiException(HttpStatus.BAD_REQUEST, "Free-text question needs valid rubric criteria");
+                    }
+                    for (var criterion : rubric.path("criteria")) {
+                        if (!criterion.isTextual() || criterion.asText().isBlank()) {
+                            throw new ApiException(HttpStatus.BAD_REQUEST, "Free-text question needs valid rubric criteria");
+                        }
+                    }
+                    var rubricMaxScore = rubric.path("maxScore");
+                    if (!rubricMaxScore.isMissingNode()
+                            && (!rubricMaxScore.isIntegralNumber()
+                                    || rubricMaxScore.intValue() != question.maxScore())) {
+                        throw new ApiException(HttpStatus.BAD_REQUEST, "Rubric maxScore must match question maxScore");
                     }
                 } else {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Unsupported question type");

@@ -144,6 +144,7 @@ public class TestDefinitionService {
             Map<String, Object> view = new LinkedHashMap<>();
             view.put("questionId", row.questionId()); view.put("type", q.path("type").asText());
             view.put("competency", q.path("competency").asText());
+            view.put("text", q.path("text").asText());
             JsonNode maxScore = q.path("maxScore").isIntegralNumber()
                     ? q.path("maxScore") : q.path("rubric").path("maxScore");
             view.put("maxScore", maxScore.intValue());

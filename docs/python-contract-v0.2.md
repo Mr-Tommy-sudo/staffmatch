@@ -18,5 +18,5 @@ and ranking `explanation` are optional because the examples omit them. Generated
 questions do not require `estimatedSeconds`; Java checks the returned total
 duration of 5–10 minutes instead. Scores must be in 0–100. Python errors 400
 and 422 are not retried; 429, 500, 503, and network failures receive at most
-two retries. Real Python integration remains to be checked when that service is
-available.
+two retries. The implemented behavior and examples are documented in
+`python-service.md`. Live OpenRouter calls require an API key.

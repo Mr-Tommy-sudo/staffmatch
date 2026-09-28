@@ -17,13 +17,13 @@ public record VacancyCreateRequest(
         @Min(0) Long salaryFrom,
         @Min(0) Long salaryTo,
         @Min(0) Integer experienceMonthsMin,
-        @NotEmpty List<@Valid Skill> skills,
+        @NotEmpty List<@NotNull @Valid Skill> skills,
         @NotNull TestMode testMode,
         String level,
         Integer durationMinutes,
         Integer questionCount,
-        List<@Valid Competency> competencies,
-        List<@Valid CustomQuestion> customQuestions
+        List<@NotNull @Valid Competency> competencies,
+        List<@NotNull @Valid CustomQuestion> customQuestions
 ) {
     public enum TestMode { NONE, AUTO, CUSTOM }
     public record Skill(@NotBlank String code, @Min(1) @Max(5) int minLevel,

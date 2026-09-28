@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/health", "/error").permitAll()
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().denyAll())
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
