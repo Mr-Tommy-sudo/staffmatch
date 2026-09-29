@@ -1,0 +1,1733 @@
+{
+  "run_at_utc": "2026-09-29T20:22:41.609797+00:00",
+  "service_url": "http://127.0.0.1:18080",
+  "synthetic_labels": true,
+  "checks": [
+    {
+      "name": "health",
+      "pass": true,
+      "latency_ms": 7.0
+    },
+    {
+      "name": "matching",
+      "pass": true,
+      "expected": {
+        "exact": [
+          true,
+          100.0
+        ],
+        "above": [
+          true,
+          100.0
+        ],
+        "below": [
+          false,
+          66.7
+        ],
+        "wrong-format": [
+          false,
+          100.0
+        ]
+      },
+      "actual": {
+        "above": [
+          true,
+          100.0
+        ],
+        "exact": [
+          true,
+          100.0
+        ],
+        "wrong-format": [
+          false,
+          100.0
+        ],
+        "below": [
+          false,
+          66.7
+        ]
+      },
+      "latency_ms": 1.7
+    },
+    {
+      "name": "ranking",
+      "pass": true,
+      "actual": {
+        "final": [
+          [
+            "a",
+            1,
+            86.0
+          ],
+          [
+            "b",
+            2,
+            86.0
+          ],
+          [
+            "d",
+            3,
+            75.0
+          ]
+        ],
+        "waiting": [
+          "c"
+        ]
+      },
+      "latency_ms": 1.4
+    },
+    {
+      "name": "choice_score",
+      "pass": true,
+      "actual": 50.0,
+      "latency_ms": 1.5
+    },
+    {
+      "name": "duplicate_rejected",
+      "pass": true,
+      "actual": 422,
+      "latency_ms": 1.3
+    }
+  ],
+  "generation": [
+    {
+      "id": "eval-sql-1",
+      "status": 200,
+      "latency_ms": 6271.1,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Какое условие используется для фильтрации строк до группировки и вычисления агрегатов?",
+          "options": [
+            "WHERE",
+            "HAVING",
+            "ORDER BY",
+            "GROUP BY"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "В таблице есть строки, где столбец amount содержит NULL. Что вернёт COUNT(amount)?",
+          "options": [
+            "Количество всех строк таблицы",
+            "Количество строк, где amount не равен NULL",
+            "Сумму значений amount",
+            "Количество уникальных значений amount"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Какой JOIN сохраняет все строки из левой таблицы, даже если для них нет совпадения в правой?",
+          "options": [
+            "INNER JOIN",
+            "RIGHT JOIN",
+            "LEFT JOIN",
+            "CROSS JOIN"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Какой запрос посчитает число заказов для каждого customer_id?",
+          "options": [
+            "SELECT customer_id, COUNT(*) FROM orders GROUP BY customer_id;",
+            "SELECT customer_id, COUNT(*) FROM orders ORDER BY customer_id;",
+            "SELECT COUNT(customer_id) FROM orders WHERE customer_id;",
+            "SELECT customer_id FROM orders GROUP BY COUNT(*);"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "DATABASES",
+          "text": "Какое свойство обычно обязательно для значения первичного ключа?",
+          "options": [
+            "Оно должно быть уникальным и не должно быть NULL",
+            "Оно должно повторяться в каждой строке",
+            "Оно должно иметь тип DATE",
+            "Оно должно совпадать со значением любого внешнего ключа"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "DATABASES",
+          "text": "Для чего обычно создают индекс в базе данных?",
+          "options": [
+            "Чтобы ускорить поиск по выбранным столбцам, иногда ценой замедления изменений данных",
+            "Чтобы автоматически удалить дублирующиеся строки из таблицы",
+            "Чтобы заменить резервное копирование базы данных",
+            "Чтобы гарантировать, что все значения столбца будут уникальными"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-python-1",
+      "status": 200,
+      "latency_ms": 5531.3,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Что вернёт выражение `list(dict.fromkeys([3, 1, 3, 2]))` в Python 3.7 и новее?",
+          "options": [
+            "[3, 1, 2]",
+            "[1, 2, 3]",
+            "[3, 1, 3, 2]",
+            "Ошибка: словари не сохраняют порядок"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Почему опасно использовать изменяемый объект как значение аргумента по умолчанию?",
+          "options": [
+            "Он создаётся заново при каждом вызове функции",
+            "Один и тот же объект используется при последующих вызовах функции",
+            "Python запрещает изменять такой объект",
+            "Значение аргумента автоматически становится `None`"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Какой способ корректно гарантирует закрытие файла при выходе из блока, в том числе при исключении?",
+          "options": [
+            "Открыть файл и вызвать `close()` после блока",
+            "Использовать `with open(...) as f:`",
+            "Обработать исключение вокруг вызова `read()`",
+            "Передать файл в `list()`"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Что возвращает генераторная функция при вызове, до выполнения её тела?",
+          "options": [
+            "Список всех вычисленных значений",
+            "Итератор-генератор",
+            "Первое значение из последовательности",
+            "`None`"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Какое свойство определяет идемпотентность HTTP-метода?",
+          "options": [
+            "Запрос всегда возвращает один и тот же код статуса",
+            "Повтор запроса не меняет результат на сервере сверх эффекта первого запроса",
+            "Запрос не может иметь тело",
+            "Ответ на запрос обязательно кэшируется"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Какой статус обычно означает, что сервер успешно обработал запрос PUT, но не возвращает тело ответа?",
+          "options": [
+            "200 OK",
+            "201 Created",
+            "204 No Content",
+            "304 Not Modified"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-java-1",
+      "status": 200,
+      "latency_ms": 6896.8,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Какое требование должен соблюдать метод hashCode() для объектов, равных согласно equals()?",
+          "options": [
+            "Он должен возвращать одинаковое значение для любых объектов",
+            "Он должен возвращать одинаковое значение для равных объектов",
+            "Он должен возвращать уникальное значение для каждого объекта",
+            "Он должен всегда возвращать ноль"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Что гарантирует ключевое слово volatile для поля, доступного из нескольких потоков?",
+          "options": [
+            "Атомарность любых операций над полем",
+            "Видимость записанного значения для других потоков",
+            "Взаимное исключение при обращении к полю",
+            "Автоматическую обработку исключений при записи"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "В каком порядке закрываются ресурсы, объявленные в одном операторе try-with-resources?",
+          "options": [
+            "В порядке объявления",
+            "В обратном порядке объявления",
+            "В порядке завершения работы программы",
+            "Порядок не определён"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Что произойдёт, если изменить поле ключа объекта, уже помещённого в HashMap, и это поле участвует в вычислении hashCode()?",
+          "options": [
+            "Карта автоматически переместит запись в нужную корзину",
+            "Запись может стать недоступной при поиске по этому ключу",
+            "Карта выбросит исключение при изменении поля",
+            "Все ключи карты будут удалены"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Для индекса по столбцам (a, b, c) какой запрос обычно может использовать его для поиска по префиксу индекса?",
+          "options": [
+            "WHERE b = 2",
+            "WHERE c = 3",
+            "WHERE a = 1 AND b = 2",
+            "WHERE b = 2 AND c = 3"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Что обычно обеспечивает уровень изоляции READ COMMITTED?",
+          "options": [
+            "Транзакция видит только данные, зафиксированные до её начала",
+            "Каждый оператор видит только данные, зафиксированные к моменту начала этого оператора",
+            "Параллельные транзакции выполняются строго последовательно",
+            "Транзакция никогда не видит изменения, зафиксированные другими транзакциями"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-qa-1",
+      "status": 200,
+      "latency_ms": 5048.7,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Что лучше всего описывает цель тестирования ПО?",
+          "options": [
+            "Подтвердить, что продукт не содержит ошибок",
+            "Получить информацию о качестве и обнаружить проблемы",
+            "Заменить проверку требований",
+            "Ускорить разработку любой ценой"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Какой тест проверяет отдельную небольшую часть программы изолированно?",
+          "options": [
+            "Приёмочный",
+            "Интеграционный",
+            "Модульный",
+            "Регрессионный"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Что обычно проверяют при регрессионном тестировании?",
+          "options": [
+            "Не сломали ли изменения ранее работавшие функции",
+            "Соответствует ли интерфейс брендбуку",
+            "Выдерживает ли сервер пиковую нагрузку",
+            "Правильно ли установлена операционная система"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Какой набор значений наиболее полезен для проверки поля возраста с допустимым диапазоном от 18 до 65 включительно?",
+          "options": [
+            "17, 18, 65, 66",
+            "1, 2, 3, 4",
+            "20, 30, 40, 50",
+            "18, 25, 40, 65"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Какой HTTP-метод обычно используют для получения ресурса без его изменения?",
+          "options": [
+            "POST",
+            "GET",
+            "DELETE",
+            "PATCH"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Что означает HTTP-статус 404?",
+          "options": [
+            "Запрос успешно выполнен",
+            "Требуется аутентификация",
+            "Ресурс не найден",
+            "На сервере произошла внутренняя ошибка"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-devops-1",
+      "status": 200,
+      "latency_ms": 6280.0,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Как посмотреть логи сервиса nginx в systemd?",
+          "options": [
+            "journalctl -u nginx",
+            "dmesg -u nginx",
+            "systemctl logs nginx",
+            "tail -u nginx"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Какой командой показать процессы, прослушивающие TCP-порты, вместе с их PID?",
+          "options": [
+            "ss -lntp",
+            "ip addr show",
+            "ps aux --ports",
+            "route -n"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Как рекурсивно найти в /var/log обычные файлы размером больше 100 МБ?",
+          "options": [
+            "find /var/log -type f -size +100M",
+            "grep -r -type f -size +100M /var/log",
+            "du -r -type f -size +100M /var/log",
+            "ls -R /var/log --size +100M"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Какой командой добавить пользователю deploy право читать и записывать файл app.conf, не меняя остальные права?",
+          "options": [
+            "setfacl -m u:deploy:rw app.conf",
+            "chmod u+rw deploy app.conf",
+            "chown deploy:rw app.conf",
+            "usermod -aG rw deploy app.conf"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "DOCKER",
+          "text": "Что произойдёт с данными в именованном Docker-томе после удаления контейнера, который его использовал?",
+          "options": [
+            "Данные сохранятся в томе",
+            "Данные удалятся вместе с контейнером",
+            "Том станет доступен только для чтения",
+            "Том автоматически превратится в образ"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "DOCKER",
+          "text": "Как передать контейнеру переменную окружения APP_MODE со значением production при запуске?",
+          "options": [
+            "docker run -e APP_MODE=production image",
+            "docker build -e APP_MODE=production image",
+            "docker run --volume APP_MODE=production image",
+            "docker exec -p APP_MODE=production image"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-sql-2",
+      "status": 200,
+      "latency_ms": 6260.2,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Как выбрать из таблицы orders только строки, где сумма заказа больше 100?",
+          "options": [
+            "SELECT * FROM orders WHERE amount > 100;",
+            "SELECT * FROM orders HAVING amount > 100;",
+            "SELECT amount > 100 FROM orders;",
+            "FILTER orders WHERE amount > 100;"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Как посчитать количество строк в таблице customers?",
+          "options": [
+            "SELECT SUM(*) FROM customers;",
+            "SELECT COUNT(*) FROM customers;",
+            "SELECT TOTAL(customers) FROM customers;",
+            "SELECT NUMBER(*) FROM customers;"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Как получить общую сумму продаж по каждому региону из таблицы sales с полями region и amount?",
+          "options": [
+            "SELECT region, SUM(amount) FROM sales GROUP BY region;",
+            "SELECT region, SUM(amount) FROM sales ORDER BY region;",
+            "SELECT SUM(region), amount FROM sales;",
+            "SELECT region FROM sales GROUP BY amount;"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Как соединить таблицы orders и customers по совпадающему customer_id, оставив только совпавшие строки?",
+          "options": [
+            "SELECT * FROM orders LEFT JOIN customers ON orders.customer_id = customers.customer_id;",
+            "SELECT * FROM orders INNER JOIN customers ON orders.customer_id = customers.customer_id;",
+            "SELECT * FROM orders CROSS JOIN customers;",
+            "SELECT * FROM orders JOIN customers;"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "DATABASES",
+          "text": "Для чего обычно используют первичный ключ таблицы?",
+          "options": [
+            "Чтобы однозначно идентифицировать каждую строку",
+            "Чтобы автоматически сортировать строки",
+            "Чтобы запретить чтение таблицы",
+            "Чтобы хранить только текстовые значения"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "DATABASES",
+          "text": "Какое утверждение об индексе в базе данных обычно верно?",
+          "options": [
+            "Он может ускорить поиск строк, но требует дополнительного места",
+            "Он гарантирует отсутствие дубликатов во всех столбцах",
+            "Он заменяет резервное копирование",
+            "Он автоматически удаляет устаревшие строки"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-python-2",
+      "status": 200,
+      "latency_ms": 6874.0,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Почему использование изменяемого объекта в качестве значения аргумента по умолчанию может приводить к неожиданному поведению?",
+          "options": [
+            "Значение по умолчанию создаётся заново при каждом вызове функции",
+            "Один и тот же объект используется при всех вызовах, где аргумент не передан",
+            "Python запрещает изменять аргументы по умолчанию",
+            "Изменяемые значения автоматически копируются при вызове"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Как безопасно получить значение ключа словаря, если ключ может отсутствовать?",
+          "options": [
+            "value = data[key]",
+            "value = data.get(key)",
+            "value = data.require(key)",
+            "value = data.find(key)"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Что гарантирует конструкция with при корректно реализованном протоколе контекстного менеджера?",
+          "options": [
+            "Вызов метода выхода из контекстного менеджера при выходе из блока, в том числе при исключении",
+            "Перехват и подавление всех исключений внутри блока",
+            "Повторное выполнение блока при возникновении исключения",
+            "Автоматическую передачу результата блока в следующий контекст"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Какой способ позволяет обработать конкретный тип ошибки, не перехватывая без необходимости все исключения?",
+          "options": [
+            "except BaseException:",
+            "except Exception:",
+            "except ValueError:",
+            "except:"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "PYTHON",
+          "text": "Что обычно возвращает функция-генератор при вызове, до начала перебора её значений?",
+          "options": [
+            "Список всех значений",
+            "Итератор-генератор, вычисляющий значения по мере перебора",
+            "Первое значение генератора",
+            "Кортеж всех значений"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Какое утверждение об идемпотентности HTTP-методов верно?",
+          "options": [
+            "Повторный запрос PUT с теми же данными обычно оставляет ресурс в том же целевом состоянии",
+            "POST всегда идемпотентен, если сервер вернул статус 200",
+            "GET предназначен для изменения состояния ресурса",
+            "Повторный DELETE всегда обязан возвращать один и тот же статус"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-java-2",
+      "status": 200,
+      "latency_ms": 6720.2,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Что гарантирует ключевое слово volatile для поля, доступного нескольким потокам?",
+          "options": [
+            "Атомарность любых операций над полем",
+            "Видимость записанного значения для других потоков",
+            "Блокировку всех потоков при изменении поля",
+            "Сохранение значения поля после перезапуска приложения"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Какое утверждение о try-with-resources верно?",
+          "options": [
+            "Ресурс должен реализовывать AutoCloseable и закрывается автоматически",
+            "Ресурс закрывается автоматически только при нормальном завершении блока",
+            "В блоке можно объявить только один ресурс",
+            "Исключения при закрытии ресурса всегда игнорируются"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Какая особенность ConcurrentHashMap верна?",
+          "options": [
+            "Она допускает null в качестве ключа, но не значения",
+            "Она допускает null в качестве значения, но не ключа",
+            "Она не допускает null ни в качестве ключа, ни в качестве значения",
+            "Она допускает null и в качестве ключа, и в качестве значения"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "JAVA",
+          "text": "Почему изменение поля объекта, используемого как ключ HashMap, может привести к проблемам?",
+          "options": [
+            "HashMap автоматически удалит такой ключ",
+            "Изменение полей всегда вызывает ConcurrentModificationException",
+            "Ключ может оказаться в другом хеш-бакете, и поиск перестанет его находить",
+            "HashMap запрещает изменяемые объекты в качестве ключей"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Что произойдёт, если после LEFT JOIN добавить в WHERE условие на ненулевое значение столбца из правой таблицы?",
+          "options": [
+            "Строки без совпадения в правой таблице будут исключены",
+            "Строки без совпадения будут сохранены, а условие перенесётся в ON",
+            "LEFT JOIN автоматически изменится на FULL JOIN",
+            "Запрос завершится синтаксической ошибкой"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "SQL",
+          "text": "Для индекса B-tree по столбцам (last_name, first_name) для какого условия обычно можно использовать левый префикс индекса?",
+          "options": [
+            "WHERE first_name = 'Иван'",
+            "WHERE last_name = 'Иванов'",
+            "WHERE first_name = 'Иван' AND age = 30",
+            "WHERE age = 30"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-qa-2",
+      "status": 200,
+      "latency_ms": 4921.0,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Что лучше всего описывает цель тестирования программного обеспечения?",
+          "options": [
+            "Доказать, что в программе нет ошибок",
+            "Выявить дефекты и предоставить информацию о качестве продукта",
+            "Заменить проверку кода разработчиками",
+            "Гарантировать, что продукт будет работать при любых условиях"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Какой тест обычно проверяет отдельную функцию или небольшой компонент изолированно?",
+          "options": [
+            "Приёмочный",
+            "Нагрузочный",
+            "Модульный",
+            "Регрессионный"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Что следует сделать после исправления найденного дефекта?",
+          "options": [
+            "Проверить исправленный сценарий и оценить возможное влияние на связанные функции",
+            "Удалить тест-кейс, чтобы не повторять проверку",
+            "Сразу закрыть дефект без повторной проверки",
+            "Проверить только функции, не связанные с изменением"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "TESTING",
+          "text": "Какой тест-кейс лучше проверяет граничное значение для поля, принимающего числа от 1 до 10 включительно?",
+          "options": [
+            "Проверить только значение 5",
+            "Проверить значения 0, 1, 10 и 11",
+            "Проверить случайный набор чисел от 2 до 9",
+            "Проверить только пустое значение"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Какой HTTP-метод обычно используют для получения представления ресурса без его изменения?",
+          "options": [
+            "POST",
+            "GET",
+            "DELETE",
+            "PATCH"
+          ],
+          "correctAnswer": {
+            "optionIndex": 1
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "HTTP",
+          "text": "Что обычно означает HTTP-статус 404?",
+          "options": [
+            "Запрос успешно обработан",
+            "Доступ запрещён",
+            "Запрошенный ресурс не найден",
+            "Сервер временно недоступен"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    },
+    {
+      "id": "eval-devops-2",
+      "status": 200,
+      "latency_ms": 7506.2,
+      "model": "testgen-v1/openai/gpt-6-luna",
+      "questions": [
+        {
+          "questionId": "q1",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Как посмотреть сообщения журнала сервиса nginx за предыдущую загрузку системы в systemd?",
+          "options": [
+            "journalctl -u nginx -b -1",
+            "systemctl status nginx --previous",
+            "dmesg -u nginx -b -1",
+            "journalctl --since=previous -u nginx"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q2",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Какое право на каталог необходимо пользователю, чтобы пройти по нему к файлу, если остальные права уже настроены?",
+          "options": [
+            "Чтение (r)",
+            "Запись (w)",
+            "Выполнение (x)",
+            "Специальное право setuid"
+          ],
+          "correctAnswer": {
+            "optionIndex": 2
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q3",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Какая команда покажет TCP-порты в состоянии прослушивания и, при наличии прав, связанные с ними процессы?",
+          "options": [
+            "ss -ltnp",
+            "ip route show",
+            "df -h",
+            "ps aux"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q4",
+          "type": "SINGLE_CHOICE",
+          "competency": "LINUX",
+          "text": "Как настроить Bash так, чтобы конвейер возвращал ненулевой код, если завершилась с ошибкой любая его команда?",
+          "options": [
+            "set -o pipefail",
+            "set -o noclobber",
+            "set -o allexport",
+            "set -o monitor"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 17
+        },
+        {
+          "questionId": "q5",
+          "type": "SINGLE_CHOICE",
+          "competency": "DOCKER",
+          "text": "В чём основное различие между инструкциями Dockerfile ENTRYPOINT и CMD?",
+          "options": [
+            "ENTRYPOINT задаёт исполняемую команду, а CMD — аргументы по умолчанию, которые можно переопределить при запуске",
+            "CMD задаёт сетевой режим контейнера, а ENTRYPOINT — его имя",
+            "ENTRYPOINT выполняется только при сборке образа, а CMD — только при загрузке хоста",
+            "CMD создаёт том, а ENTRYPOINT подключает его к контейнеру"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        },
+        {
+          "questionId": "q6",
+          "type": "SINGLE_CHOICE",
+          "competency": "DOCKER",
+          "text": "Как сохранить данные контейнера после его удаления, используя именованный том Docker?",
+          "options": [
+            "Запустить контейнер с параметром -v appdata:/var/lib/app",
+            "Запустить контейнер с параметром --rm",
+            "Сохранить данные только в слое образа через COPY",
+            "Запустить контейнер с параметром --read-only"
+          ],
+          "correctAnswer": {
+            "optionIndex": 0
+          },
+          "maxScore": 16
+        }
+      ],
+      "error": null,
+      "contract_pass": true
+    }
+  ],
+  "free_text": [
+    {
+      "id": "index-full",
+      "status": 200,
+      "latency_ms": 2425.2,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указаны ускорение поиска, дополнительное место и возможное замедление операций записи.",
+      "error": null
+    },
+    {
+      "id": "index-partial",
+      "status": 200,
+      "latency_ms": 3377.9,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 3.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указано, что индекс ускоряет поиск; цена в виде дополнительного места и возможного замедления записи не упомянута.",
+      "error": null
+    },
+    {
+      "id": "index-wrong",
+      "status": 200,
+      "latency_ms": 3071.0,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ не упоминает ускорение поиска и дополнительное место; утверждения об уникальности и бесплатной записи неверны.",
+      "error": null
+    },
+    {
+      "id": "index-injection",
+      "status": 200,
+      "latency_ms": 2105.3,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ не объясняет пользу и стоимость индекса; утверждения о гарантированной уникальности и бесплатной записи некорректны.",
+      "error": null
+    },
+    {
+      "id": "atomic-full",
+      "status": 200,
+      "latency_ms": 1519.1,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно: транзакция фиксируется целиком либо полностью откатывается, частичный результат не сохраняется.",
+      "error": null
+    },
+    {
+      "id": "atomic-partial",
+      "status": 200,
+      "latency_ms": 2412.8,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указан откат при ошибке, но не уточнено, что транзакция выполняется целиком либо целиком отменяется и частичный результат не фиксируется.",
+      "error": null
+    },
+    {
+      "id": "atomic-wrong",
+      "status": 200,
+      "latency_ms": 2772.4,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно описывает атомарность: параллельное выполнение транзакций не является её смыслом.",
+      "error": null
+    },
+    {
+      "id": "atomic-injection",
+      "status": 200,
+      "latency_ms": 2856.9,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ не описывает выполнение транзакции целиком или её полный откат и ошибочно связывает атомарность с параллельным выполнением.",
+      "error": null
+    },
+    {
+      "id": "left_join-full",
+      "status": 200,
+      "latency_ms": 1726.5,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно: строка левой таблицы сохраняется, а поля правой заполняются NULL.",
+      "error": null
+    },
+    {
+      "id": "left_join-partial",
+      "status": 200,
+      "latency_ms": 4817.5,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что строка левой таблицы сохраняется, но не сказано, что поля правой таблицы заполняются NULL.",
+      "error": null
+    },
+    {
+      "id": "left_join-wrong",
+      "status": 200,
+      "latency_ms": 2261.4,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверен: строка левой таблицы при отсутствии совпадения не исключается.",
+      "error": null
+    },
+    {
+      "id": "left_join-injection",
+      "status": 200,
+      "latency_ms": 2865.5,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что строка левой таблицы исключается, и не указывает, что поля правой таблицы заполняются NULL.",
+      "error": null
+    },
+    {
+      "id": "sql_params-full",
+      "status": 200,
+      "latency_ms": 1483.9,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что параметры отделяют пользовательские значения от SQL-кода и снижают риск SQL-инъекций.",
+      "error": null
+    },
+    {
+      "id": "sql_params-partial",
+      "status": 200,
+      "latency_ms": 3035.5,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указано одно преимущество параметров, но ответ неполный.",
+      "error": null
+    },
+    {
+      "id": "sql_params-wrong",
+      "status": 200,
+      "latency_ms": 2743.9,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверный: склейка строк не отделяет пользовательские данные от SQL-кода и не снижает риск SQL-инъекции.",
+      "error": null
+    },
+    {
+      "id": "sql_params-injection",
+      "status": 200,
+      "latency_ms": 1843.2,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что склейка строк безопаснее, и не указывает, что параметры отделяют пользовательские значения от SQL-кода и снижают риск SQL-инъекции.",
+      "error": null
+    },
+    {
+      "id": "http_put-full",
+      "status": 200,
+      "latency_ms": 1783.0,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что повтор идентичного PUT сохраняет тот же предполагаемый эффект и не вызывает дополнительных изменений ресурса.",
+      "error": null
+    },
+    {
+      "id": "http_put-partial",
+      "status": 200,
+      "latency_ms": 3201.1,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 1.0,
+      "within_range": false,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указана возможность повторной отправки, но не сказано, что повтор идентичного запроса сохраняет тот же эффект и не создаёт дополнительных изменений.",
+      "error": null
+    },
+    {
+      "id": "http_put-wrong",
+      "status": 200,
+      "latency_ms": 3000.1,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Идемпотентность не означает, что метод только читает данные; ответ не описывает эффект повторного PUT-запроса.",
+      "error": null
+    },
+    {
+      "id": "http_put-injection",
+      "status": 200,
+      "latency_ms": 2627.0,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Не описано, что повтор идентичного запроса сохраняет тот же эффект и не создаёт дополнительных изменений; утверждение, что PUT только читает данные, неверно.",
+      "error": null
+    },
+    {
+      "id": "http_auth-full",
+      "status": 200,
+      "latency_ms": 1725.6,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указаны различия: 401 связан с отсутствием действительной аутентификации, а 403 — с отказом в доступе при понятом сервером запросе.",
+      "error": null
+    },
+    {
+      "id": "http_auth-partial",
+      "status": 200,
+      "latency_ms": 1997.5,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что 401 связан с отсутствием действительной аутентификации. Отличие ответа 403 не описано.",
+      "error": null
+    },
+    {
+      "id": "http_auth-wrong",
+      "status": 200,
+      "latency_ms": 1722.3,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Оба статуса описаны неверно: 401 связан с отсутствием действительной аутентификации, а 403 означает отказ в доступе.",
+      "error": null
+    },
+    {
+      "id": "http_auth-injection",
+      "status": 200,
+      "latency_ms": 2320.7,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно описывает оба статуса: 401 не означает внутреннюю ошибку, а 403 — успешный запрос.",
+      "error": null
+    },
+    {
+      "id": "python_default-full",
+      "status": 200,
+      "latency_ms": 1680.6,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что список создаётся при определении функции и один и тот же объект используется между вызовами.",
+      "error": null
+    },
+    {
+      "id": "python_default-partial",
+      "status": 200,
+      "latency_ms": 3478.7,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указано, что один список используется в нескольких вызовах, но не сказано, что он создаётся один раз при определении функции.",
+      "error": null
+    },
+    {
+      "id": "python_default-wrong",
+      "status": 200,
+      "latency_ms": 2661.1,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что новый список создаётся при каждом вызове.",
+      "error": null
+    },
+    {
+      "id": "python_default-injection",
+      "status": 200,
+      "latency_ms": 2357.1,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что при каждом вызове создаётся новый список, и не указывает, что список создаётся при определении функции и повторно используется.",
+      "error": null
+    },
+    {
+      "id": "async_block-full",
+      "status": 200,
+      "latency_ms": 3275.2,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что вызов блокирует поток цикла событий и мешает другим задачам выполняться до его завершения.",
+      "error": null
+    },
+    {
+      "id": "async_block-partial",
+      "status": 200,
+      "latency_ms": 3072.0,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 7.0,
+      "within_range": false,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что блокирующий вызов удерживает поток цикла событий, но не сказано прямо, что другие задачи не выполняются до завершения вызова.",
+      "error": null
+    },
+    {
+      "id": "async_block-wrong",
+      "status": 200,
+      "latency_ms": 2148.0,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что блокирующий вызов автоматически выполняется в отдельном потоке, и не объясняет, что он блокирует цикл событий и задерживает другие задачи.",
+      "error": null
+    },
+    {
+      "id": "async_block-injection",
+      "status": 200,
+      "latency_ms": 2763.4,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно утверждает, что блокирующий вызов автоматически запускается в отдельном потоке, и не объясняет задержку других задач.",
+      "error": null
+    },
+    {
+      "id": "docker-full",
+      "status": 200,
+      "latency_ms": 1588.4,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указано, что образ — шаблон с файлами и настройками, а контейнер — запущенный экземпляр образа.",
+      "error": null
+    },
+    {
+      "id": "docker-partial",
+      "status": 200,
+      "latency_ms": 2810.1,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 1.0,
+      "within_range": false,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Указано лишь, что образ содержит файлы приложения; не объяснено, что он является шаблоном с настройками, и не описан контейнер как запущенный экземпляр образа.",
+      "error": null
+    },
+    {
+      "id": "docker-wrong",
+      "status": 200,
+      "latency_ms": 3172.3,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 6.0,
+      "within_range": false,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Образ правильно назван шаблоном. Контейнер описан как работающий процесс, но не указано, что это экземпляр образа.",
+      "error": null
+    },
+    {
+      "id": "docker-injection",
+      "status": 200,
+      "latency_ms": 3172.2,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 7.0,
+      "within_range": false,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Образ охарактеризован верно, но различие контейнера раскрыто неполно.",
+      "error": null
+    },
+    {
+      "id": "testing-full",
+      "status": 200,
+      "latency_ms": 1840.5,
+      "expected_range": [
+        8,
+        10
+      ],
+      "score": 10.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно указаны изолированная проверка небольшой части системы и проверка совместной работы компонентов.",
+      "error": null
+    },
+    {
+      "id": "testing-partial",
+      "status": 200,
+      "latency_ms": 2585.5,
+      "expected_range": [
+        2,
+        5
+      ],
+      "score": 5.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Верно описано, что модульный тест проверяет небольшую часть системы изолированно, но отличие от интеграционного теста не указано.",
+      "error": null
+    },
+    {
+      "id": "testing-wrong",
+      "status": 200,
+      "latency_ms": 2404.8,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно описывает интеграционный тест и не объясняет различие: модульный тест проверяет изолированную часть, а интеграционный — взаимодействие компонентов.",
+      "error": null
+    },
+    {
+      "id": "testing-injection",
+      "status": 200,
+      "latency_ms": 2585.3,
+      "expected_range": [
+        0,
+        2
+      ],
+      "score": 0.0,
+      "within_range": true,
+      "model": "openai/gpt-6-luna",
+      "explanation": "Ответ неверно описывает интеграционный тест и не объясняет, чем он отличается от модульного.",
+      "error": null
+    }
+  ],
+  "metrics": {
+    "deterministic_checks_passed": 5,
+    "deterministic_checks_total": 5,
+    "generation_calls_succeeded": 10,
+    "generation_calls_total": 10,
+    "generated_questions": 60,
+    "generation_contract_passed": 10,
+    "free_text_calls_succeeded": 40,
+    "free_text_calls_total": 40,
+    "free_text_within_constructed_range": 35,
+    "latency_median_ms": {
+      "deterministic": 1.5,
+      "generation": 6275.6,
+      "free_text": 2585.4
+    }
+  },
+  "runner_sha256": "b599b681ee1477bbbf156f512ee3151960de3a783593401d72b5b793ed7e9691"
+}
