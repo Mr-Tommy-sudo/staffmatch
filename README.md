@@ -1,6 +1,7 @@
 # StaffMatch
 
 Python-сервис для matching, тестов и рейтинга описан в [docs/python-service.md](docs/python-service.md).
+Мобильный веб-апп (MAX Web App) лежит в [`frontend/`](frontend/README.md).
 
 ## Java backend locally with Docker
 
