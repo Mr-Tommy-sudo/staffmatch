@@ -25,8 +25,9 @@
 
 ## 1. Подготовка
 
-Требуются: **Docker + Docker Compose**, **Python 3.13 и uv** (для сервиса
-оценки вне Docker), **Node.js не нужен** — фронтенд статика без сборки.
+Требуются: **Docker + Docker Compose** для полного запуска. **Python 3.13
+и uv** нужны только если вы хотите запускать сервис оценки вручную вне
+Docker (см. ниже). **Node.js не нужен** — фронтенд статика без сборки.
 
 Скопируйте пример окружения в корне репозитория:
 
@@ -38,8 +39,8 @@ cp .env.example .env
 
 | Переменная | Обязательно | Что указать |
 | --- | --- | --- |
-| `POSTGRES_PASSWORD` | да | Пароль БД (минимум для локальной разработки: что угодно, кроме `change-me` не обязательно; `change-me` подходит для разработки) |
-| `MAX_BOT_TOKEN` | да | Токен MAX-бота. Используется для проверки подписи `initData`. НЕ коммитить. |
+| `POSTGRES_PASSWORD` | да | Пароль БД. Для локальной разработки подойдёт и `change-me` из примера. |
+| `MAX_BOT_TOKEN` | да | Токен MAX-бота; проверяет подпись `initData`. Для демо и генерации локальной initData токен может быть любым (например `replace-with-your-max-bot-token` из примера) — реальный вход через MAX заработает только с настоящим токеном бота. НЕ коммитить. |
 | `CORS_ALLOWED_ORIGINS` | да* | Точный origin фронтенда (см. шаг 4). Несколько — через запятую, `*` для продакшена нельзя. |
 | `OPENROUTER_API_KEY` | нет | Для генерации AUTO-тестов и проверки свободных ответов. Матчинг, рейтинг и выбор вариантов работают без него. |
 | `OPENROUTER_MODEL` | нет | Модель по умолчанию `openai/gpt-6-luna` |
@@ -67,7 +68,8 @@ docker compose logs -f backend
 
 - API бекенда: `http://localhost:8080`
 - Проверка здоровья: `http://localhost:8080/actuator/health` → `{"status":"UP"}`
-- Python-сервис локально: `http://127.0.0.1:8000/api/v1/health` → `{"status":"ok"}`, OpenAPI: `http://127.0.0.1:8000/docs`
+- Python-сервис наружу не публикуется: внутри Docker-сети бекенд обращается
+  к нему по `http://python:8000` (`PYTHON_BASE_URL` из `.env`)
 
 Данные PostgreSQL живут в Docker-томе `postgres_data` и переживают
 перезапуск контейнеров. Сбросить БД полностью:
@@ -76,8 +78,9 @@ docker compose logs -f backend
 docker compose down -v
 ```
 
-> Python доступен снаружи только на `127.0.0.1:8000`; внутри сети Compose
-> бекенд обращается к `http://python:8000` (`PYTHON_BASE_URL` из `.env`).
+> Python-сервис наружу не публикуется; внутри сети Compose бекенд
+> обращается к нему по `http://python:8000` (`PYTHON_BASE_URL` из `.env`).
+> Так порт `8000` на хосте остаётся свободным и его занимает фронтенд.
 
 ### Запуск только Python-сервиса (без Docker)
 
@@ -87,6 +90,10 @@ docker compose down -v
 uv sync --frozen
 uv run --env-file ../.env uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
+
+> В этом ручном сценарии Python займёт порт `8000` на хосте, поэтому
+> фронтенд запускайте на другом порту (например `5173`) и поправьте
+> `CORS_ALLOWED_ORIGINS` в `.env`.
 
 ---
 
@@ -122,9 +129,11 @@ cd frontend
 python3 -m http.server 8000
 ```
 
-Откройте `http://localhost:8000`. Если фронт на `:8000`, а бекенд на
-`:8080`, укажите в `.env` бекенда `CORS_ALLOWED_ORIGINS=http://localhost:8000`
-и перезапустите compose. В `config.js` базовый URL бекенда —
+Откройте `http://localhost:8000`. Порт `8000` свободен: Python-сервис из
+Compose больше не публикуется наружу (см. `compose.yaml`) и доступен только
+бекенду внутри Docker-сети. Для этого порта в `.env` бекенда укажите
+`CORS_ALLOWED_ORIGINS=http://localhost:8000` (значение из `.env.example`) и
+перезапустите Compose. Базовый URL бекенда указан в `frontend/config.js` —
 `http://localhost:8080`.
 
 > Внутри MAX `window.WebApp.initData` подставляется автоматически. В обычном
