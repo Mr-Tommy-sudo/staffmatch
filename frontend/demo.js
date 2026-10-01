@@ -23,9 +23,13 @@ function enterDemo() {
 
 function exitDemo() {
   localStorage.removeItem(DEMO_KEY);
+  if (localStorage.getItem(INIT_DATA_KEY) === 'demo-session') localStorage.removeItem(INIT_DATA_KEY);
+  state.demo = false;
+  boot();
 }
 
 window.enterDemo = enterDemo;
+window.exitDemo = exitDemo;
 window.isDemoMode = isDemoMode;
 
 /* ---------------------- Моковые данные ---------------------- */
@@ -164,7 +168,7 @@ const demo = {
         { rank: 2, candidateId: 'cand-1002', finalScore: 72, state: 'RECOMMENDED' }
       ],
       waiting: [
-        { candidateId: 'cand-1003', matchingScore: 35 }
+        { candidateId: 'cand-1003', components: { matching: 35 }, state: 'WAITING_TEST' }
       ]
     },
     'vac-12': {

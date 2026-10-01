@@ -24,6 +24,7 @@ const state = {
   candidate: null,          // профиль кандидата
   assignments: [],          // назначенные тесты
   invitations: [],          // приглашения
+  candidateListErrors: { assignments: null, invitations: null },
   testSession: null,        // { assignment, questions, answers, deadline }
   vacancies: [],            // вакансии нанимателя
   vacancy: null,            // текущая вакансия
@@ -140,8 +141,26 @@ async function refreshCandidateProfile() {
 }
 
 async function refreshCandidateLists() {
-  try { state.assignments = await api('/api/v1/candidate/test-assignments'); } catch (_) { state.assignments = []; }
-  try { state.invitations = await api('/api/v1/candidate/invitations'); } catch (_) { state.invitations = []; }
+  const results = await Promise.allSettled([
+    api('/api/v1/candidate/test-assignments'),
+    api('/api/v1/candidate/invitations')
+  ]);
+  state.assignments = results[0].status === 'fulfilled' ? results[0].value : [];
+  state.invitations = results[1].status === 'fulfilled' ? results[1].value : [];
+  state.candidateListErrors = {
+    assignments: results[0].status === 'rejected' ? results[0].reason : null,
+    invitations: results[1].status === 'rejected' ? results[1].reason : null
+  };
+  results.forEach((result, i) => {
+    if (result.status === 'rejected' && result.reason.status !== 401) {
+      toast(`Не удалось загрузить ${i ? 'приглашения' : 'тесты'}: ${result.reason.message}`);
+    }
+  });
+  const unauthorized = results.find(result => result.status === 'rejected' && result.reason.status === 401);
+  if (unauthorized) {
+    showView('connect');
+    throw unauthorized.reason;
+  }
 }
 
 /* ---------- Профиль кандидата ---------- */
@@ -377,6 +396,7 @@ function numberOrNull(id) {
 
 /* ---------- Тесты кандидата ---------- */
 function assignmentsView() {
+  if (state.candidateListErrors.assignments) return emptyBox('⚠️', 'Не удалось загрузить тесты');
   const list = state.assignments;
   return `
   <div class="page-head"><h2>Тесты</h2><p>Назначенные проверочные задания</p></div>
@@ -530,6 +550,7 @@ async function submitTest() {
 
 /* ---------- Приглашения кандидата ---------- */
 function invitationsView() {
+  if (state.candidateListErrors.invitations) return emptyBox('⚠️', 'Не удалось загрузить приглашения');
   const list = state.invitations;
   return `
   <div class="page-head"><h2>Приглашения</h2><p>Отклики и предложения работодателей</p></div>
@@ -637,6 +658,7 @@ function statusShort(v) {
 const createForm = {
   skills: [],
   selectedWF: 'REMOTE',
+  level: 'JUNIOR',
   testMode: 'AUTO',
   competencies: [],
   questions: [],
@@ -649,6 +671,7 @@ function openCreateVacancy() {
   createForm.competencies = [];
   createForm.questions = [];
   createForm.selectedWF = 'REMOTE';
+  createForm.level = 'JUNIOR';
   createForm.testMode = 'AUTO';
   state.vacancyTab = 'create';
   state.view = 'vacancy';
@@ -688,7 +711,7 @@ function createVacancyForm() {
       <div class="field">
         <div class="label-hint"><label>Уровень</label></div>
         <div class="opt-row">
-          ${LEVELS.map(l => `<button type="button" class="opt ${l === 'JUNIOR' ? 'active' : ''}" data-lvl="${l}" onclick="setVacLevel('${l}')">${l}</button>`).join('')}
+          ${LEVELS.map(l => `<button type="button" class="opt ${l === createForm.level ? 'active' : ''}" data-lvl="${l}" onclick="setVacLevel('${l}')">${l}</button>`).join('')}
         </div>
       </div>
     </div>
@@ -764,6 +787,7 @@ function rerenderVacancyForm() {
 }
 
 function setVacLevel(l) {
+  createForm.level = l;
   document.querySelectorAll('[data-lvl]').forEach(e => e.classList.toggle('active', e.dataset.lvl === l));
 }
 
@@ -822,7 +846,7 @@ function customQBlock(q, i) {
 
 function removeCustomQ(i) {
   createForm.questions.splice(i, 1);
-  render('vacancy-screen', createVacancyForm());
+  rerenderVacancyForm();
 }
 
 function editCustomQ(i) {
@@ -949,7 +973,7 @@ async function submitVacancy() {
   const salaryFrom = numberOrNull('vac-from');
   const salaryTo = numberOrNull('vac-to');
   const experienceMonthsMin = numberOrNull('vac-exp');
-  const level = document.querySelector('[data-lvl].active')?.dataset.lvl || 'JUNIOR';
+  const level = createForm.level;
 
   if (!role) return toast('Укажите должность');
   if (!createForm.skills.length) return toast('Добавьте требуемые навыки');
@@ -1181,7 +1205,7 @@ function rankingTab() {
       <div class="row-icon" style="background:var(--amber-soft)">⏳</div>
       <div class="row-body">
         <div class="row-title">Кандидат ${shortId(w.candidateId)}</div>
-        <div class="row-sub">Матчинг: ${Math.round(w.matchingScore)} · ждёт выполнение теста</div>
+        <div class="row-sub">Матчинг: ${Number.isFinite(w.components?.matching) ? Math.round(w.components.matching) : '—'} · ждёт выполнение теста</div>
       </div>
     </div>`).join('')}` : ''}
   ${!final.length && !waiting.length ? emptyBox('📊', 'Кандидатов в рейтинге нет') : ''}`;
@@ -1287,7 +1311,7 @@ function renderShell(role) {
   tabbar.innerHTML = tabs.map(([t, label, countKey]) => `
     <button class="tab ${state.tab === t ? 'active' : ''}" data-tab="${t}" onclick="switchTab('${t}')">
       <span class="tab-ico">${tabIcon(t)}</span>${label}${countKey ? `<span class="tab-count ${tabCount(countKey) ? '' : 'hidden'}">${tabCount(countKey)}</span>` : ''}
-    </button>`).join('');
+    </button>`).join('') + (isDemoMode() ? '<button class="tab" onclick="exitDemo()"><span class="tab-ico">↩</span>Выйти из демо</button>' : '');
 }
 
 function tabIcon(t) {
@@ -1306,10 +1330,15 @@ function tabCount(kind) {
   return 0;
 }
 
-function switchTab(t) {
+async function switchTab(t) {
   state.tab = t;
   state.editProfile = false;
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.datasetTab === t));
+  if (state.view === 'candidate' && (t === 'tests' || t === 'invitations')) {
+    renderShell('candidate');
+    render('cand-tab', emptyBox('⏳', 'Загрузка…'));
+    try { await refreshCandidateLists(); }
+    catch (e) { if (e.status === 401) return; }
+  }
   renderShell(state.view === 'employer' ? 'employer' : 'candidate');
   renderTab();
   const view = document.getElementById('view-' + state.view);
@@ -1435,6 +1464,7 @@ function roleScreen() {
           ${state.pendingRole === role ? '<div class="spinner"></div>' : '<span style="color:var(--text-soft)">›</span>'}
         </div>
       </div>`).join('')}
+    ${isDemoMode() ? '<button class="btn btn-ghost btn-block" onclick="exitDemo()">Выйти из демо</button>' : ''}
   </div>`;
 }
 
