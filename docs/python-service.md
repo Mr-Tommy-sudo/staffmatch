@@ -37,7 +37,7 @@ uv run --env-file ../.env uvicorn app.main:app --host 127.0.0.1 --port 8000
 docker compose up --build
 ```
 
-Compose открывает Python только на `127.0.0.1:8000`; Java внутри сети Compose обращается к `http://python:8000`. Для входа через MAX в корневом `.env` потребуется также настоящий `MAX_BOT_TOKEN`: созданное значение `replace-with-your-max-bot-token` — прежняя заглушка проекта. Пароль PostgreSQL `change-me` предназначен только для локальной разработки. Проверка здоровья подтверждает работу HTTP-процесса, а не доступность OpenRouter.
+Compose не публикует Python наружу; Java внутри сети Compose обращается к `http://python:8000`. Для входа через MAX в корневом `.env` потребуется также настоящий `MAX_BOT_TOKEN`: созданное значение `replace-with-your-max-bot-token` — прежняя заглушка проекта. Пароль PostgreSQL `change-me` предназначен только для локальной разработки. Проверка здоровья подтверждает работу HTTP-процесса, а не доступность OpenRouter.
 
 ## Matching
 

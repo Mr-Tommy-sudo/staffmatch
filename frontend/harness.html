@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>STAFFMATCH-HARNESS</title>
+</head>
+<body>
+<div class="app" id="root"></div>
+<link rel="stylesheet" href="styles.css?v=h">
+<script src="config.js?v=h"></script>
+<script src="api.js?v=h"></script>
+<script src="demo.js?v=h"></script>
+<script src="app.js?v=h"></script>
+<script>
+var caught = null;
+window.addEventListener('error', function (e) { caught = 'err: ' + (e && e.message ? e.message : e); document.title = 'JSERR ' + caught; });
+window.addEventListener('unhandledrejection', function (e) { caught = 'rej: ' + (e && e.reason && (e.reason.message || e.reason)); document.title = 'JSREJ ' + caught; });
+document.title = 'BOOT typeof-state=' + (typeof state) + ' typeof-demo=' + (typeof enterDemo);
+
+var log = [];
+function segActive() {
+  var b = document.querySelectorAll('#vacancy-screen .seg button');
+  var out = [];
+  for (var i = 0; i < b.length; i++) out.push(b[i].classList.contains('active'));
+  return out.join(',');
+}
+function report(tag) {
+  var extra;
+  try {
+    extra = {
+      caught: caught,
+      logoutBtn: !!document.querySelector('.btn-danger-soft'),
+      matchCards: document.querySelectorAll('#vacancy-screen .candidate').length
+    };
+  } catch (e) { extra = { probeFail: e.message, caught: caught }; }
+  log.push(tag + (extra.caught ? ' C=' + extra.caught : '') + (extra.logoutBtn !== undefined ? ' logout=' + extra.logoutBtn : ''));
+  document.title = 'FLOW ' + log.join(' || ');
+}
+
+setTimeout(function () {
+  try { enterDemo(); } catch (e) { caught = 'enterDemo: ' + e.message; }
+  setTimeout(function () {
+    try { rolePick('candidate'); } catch (e) { caught = 'rolePick: ' + e.message; }
+    setTimeout(function () {
+      var before = state.candidate.skills.length;
+      toggleEditProfile();
+      setTimeout(function () {
+        document.getElementById('new-skill-code').value = 'KAFKA';
+        document.getElementById('new-skill-level').value = '4';
+        addCandSkill();
+        setTimeout(function () { report('DRAFT-SKILL-added draft=' + (state.editDraft ? state.editDraft.skills.length : '-') + ' cand=' + state.candidate.skills.length + ' before=' + before); }, 200);
+        setTimeout(function () {
+          cancelEditProfile();
+          setTimeout(function () { report('CANCELED draft=' + (state.editDraft + '') + ' cand=' + state.candidate.skills.length + ' editProfile=' + state.editProfile); }, 300);
+        }, 300);
+      }, 250);
+    }, 900);
+  }, 600);
+}, 700);
+
+setTimeout(function () {
+  try { rolePick('employer'); } catch (e) { caught = 'rolePick-employer: ' + e.message; }
+  report('EMPLOYER-role');
+  setTimeout(function () {
+    try { openVacancy('vac-11'); } catch (e) { caught = 'openVacancy: ' + e.message; }
+    setTimeout(function () {
+      report('EMPLOYER-overview matches=' + (state.matches ? state.matches.length : -1) + ' rank=' + (state.ranking ? 'y' : 'n') + ' res=' + (state.results ? state.results.length : -1));
+      setVacancyTab('matches');
+      setTimeout(function () { report('EMPLOYER-tab-matches cards=' + document.querySelectorAll('.candidate').length + ' rows=' + document.querySelectorAll('#vacancy-screen .row').length + ' matchbadges=' + document.querySelectorAll('.match-badges .mb').length + ' segActive=' + segActive()); }, 150);
+      setTimeout(function () {
+        setVacancyTab('results');
+        setTimeout(function () {
+          report('EMPLOYER-tab-results retry=' + (typeof retryScore === 'function'));
+          setTimeout(function () {
+            try { retryScore('asn-r-2'); } catch (e) { caught = 'retryScore: ' + e.message; }
+            setTimeout(function () {
+              report('EMPLOYER-retry-asn-r-2 status=' + (state.results.find ? (state.results.find(function (x) { return x.id === 'asn-r-2'; }) || {}).status : '?'));
+              setTimeout(function () {
+                backToVacancies();
+                setTimeout(function () {
+                  try { openCreateVacancy(); } catch (e) { caught = 'openCreateVacancy: ' + e.message; }
+                  setTimeout(function () {
+                    try {
+                      setTestMode('CUSTOM');
+                      var seAfter = document.querySelectorAll('#vacancy-screen .screen-enter').length;
+                      setTestMode('AUTO');
+                      var seAuto = document.querySelectorAll('#vacancy-screen .screen-enter').length;
+                      setTestMode('CUSTOM');
+                      report('EMPLOYER-notab se=' + seAfter + ' auto=' + seAuto + ' after=' + document.querySelectorAll('#vacancy-screen .screen-enter').length);
+                      openQuestionModal();
+                      document.getElementById('q-type').selectedIndex = 0;
+                      document.getElementById('q-comp').value = 'DOCKER';
+                      document.getElementById('q-text').value = 'Как развернёте контейнер?';
+                      document.getElementById('q-opt-0').value = 'docker run';
+                      document.getElementById('q-opt-1').value = 'kubectl';
+                      var optBefore = document.querySelectorAll('#q-opt-list .opt-list-row').length;
+                      addOptionInput();
+                      var optAfter = document.querySelectorAll('#q-opt-list .opt-list-row').length;
+                      var list = document.getElementById('q-opt-list');
+                      var btn = document.querySelector('#q-extra button[onclick="addOptionInput()"]');
+                      var optAboveBtn = !!list && !!btn && (btn.previousElementSibling === list);
+                      var lastRow = list && list.lastElementChild;
+                      var delBtns = list ? list.querySelectorAll('.opt-list-del').length : 0;
+                      removeOptionInput(optAfter - 1);
+                      var optAfterDel = document.querySelectorAll('#q-opt-list .opt-list-row').length;
+                      document.getElementById('q-opt-0').value = 'docker run';
+                      document.getElementById('q-opt-1').value = 'kubectl';
+                      var optDelKeeps = document.querySelectorAll('#q-opt-list .opt-list-row').length;
+                      var delStill = !!document.querySelector('#q-opt-list .opt-list-del');
+                      saveQuestion(-1);
+                      createForm.editingQuestion = null;
+                      closeModal();
+                      document.getElementById('vac-role').value = 'DevOps Engineer';
+                      document.getElementById('vac-city').value = 'Казань';
+                      document.getElementById('vac-hours').value = '40';
+                      document.getElementById('vac-from').value = '200000';
+                      document.getElementById('vac-to').value = '280000';
+                      document.getElementById('new-vac-skill').value = 'DOCKER';
+                      document.getElementById('new-vac-min').value = '3';
+                      addVacSkill();
+                      report('EMPLOYER-qmodal opts=' + (createForm.questions[0] ? createForm.questions[0].options.length : -1) + ' opt-hold=' + (optBefore) + ' added=' + (optAfter) + ' abtn=' + optAboveBtn + ' delVals=' + optAfterDel + ' delKeeps=' + optDelKeeps + ' delBtn=' + delStill + ' delBtns=' + delBtns + ' qs=' + createForm.questions.length + ' role=' + document.getElementById('vac-role').value);
+                      submitVacancy();
+                    } catch (e) { caught = 'submitVacancy: ' + e.message; }
+setTimeout(function () {
+            report('EMPLOYER-create role=' + (state.vacancy ? state.vacancy.role : '-') + ' view=' + state.view + ' matchesTab=' + state.vacancyTab + ' head_close=' + !!document.querySelector('#vacancy-screen .test-head-close'));
+            setTimeout(function () {
+              setVacancyTab('matches');
+              setTimeout(function () { report('EMPLOYER-newvac-matches cards=' + document.querySelectorAll('#vacancy-screen .candidate').length + ' vacs=' + state.vacancies.length); }, 150);
+                      }, 250);
+                    }, 300);
+                  }, 200);
+                }, 250);
+              }, 200);
+            }, 250);
+          }, 200);
+        }, 150);
+      }, 200);
+    }, 400);
+  }, 300);
+}, 3200);
+</script>
+</body>
+</html>

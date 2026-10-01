@@ -37,11 +37,11 @@ class StaffmatchApplicationTests {
     @Test
     void configuredFrontendOriginCanSendPreflightRequest() throws Exception {
         mockMvc.perform(options("/api/v1/me")
-                        .header("Origin", "http://localhost:5173")
+                        .header("Origin", "http://localhost:8000")
                         .header("Access-Control-Request-Method", "GET")
                         .header("Access-Control-Request-Headers", "X-Max-Init-Data"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:8000"));
     }
 
     @Test
